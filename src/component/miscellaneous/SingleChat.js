@@ -22,10 +22,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const [typing, setTyping] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
     const [clickButton, setClickButton] = useState(false);
-    // const userId = decodeToken(user?.token);
     const decodeId = decodeToken(user?.token);
     const toast = useToast();
-    console.log(selectedChat);
     const sendMessage = async (event) => {
         if (newMessages) {
             socket.emit('stop typing', selectedChat._id);
@@ -35,8 +33,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     chatId: selectedChat._id,
                 });
                 if (response.status == 200) {
-                    // setNewMessages('');
-                    // console.log(response);
                     await socket.emit('newMessage', response.data);
                     setMessages([...messages, response.data]);
                 }
@@ -47,7 +43,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     duration: 2000,
                     isClosable: true,
                 });
-                console.log(error);
             }
         }
     };
@@ -110,10 +105,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 setFetchAgain(!fetchAgain);
             }
         } else {
-            console.log(newMessageRecieved);
-            if (decodeId === newMessageRecieved.sender._id) {
-                return;
-            }
+            // if (decodeId === newMessageRecieved.sender._id) {
+            //     return;
+            // }
             setMessages([...messages, newMessageRecieved]);
         }
     });
