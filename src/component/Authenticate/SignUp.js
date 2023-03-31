@@ -16,6 +16,7 @@ import {
     WrapItem,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import axiosInstance from '../../AxiosConfig/AxiosConfig';
 
 const SignUp = () => {
     const [show, setShow] = useState(false);
@@ -28,7 +29,7 @@ const SignUp = () => {
     const [loading, setLoading] = useState(false);
     const toast = useToast();
     const handleSubmit = async () => {
-        if (!email || !password || !name || !confirmPassword || !pics) {
+        if (!email || !password || !name || !confirmPassword) {
             toast({
                 title: 'Account created.',
                 description: 'Vui lòng điền đầy đủ thông tin.',
@@ -58,8 +59,7 @@ const SignUp = () => {
                     pic: pics,
                 };
                 setLoading(true);
-                const response = await axios.post('http://localhost:3306/api/createUser', form);
-
+                const response = await axiosInstance().post('/api/createUser', form);
                 if (response) {
                     console.log(response);
                     if (response.status == 201) {
@@ -163,7 +163,7 @@ const SignUp = () => {
                     }}
                 />
             </FormControl>
-            <Wrap spacing={4}>
+            <Wrap spacing={4} w={'100%'} display={'flex'} justifyContent={'center'}>
                 <WrapItem width={'100%'}>
                     <Button
                         colorScheme="blue"

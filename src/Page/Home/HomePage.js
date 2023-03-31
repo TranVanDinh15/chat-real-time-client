@@ -27,8 +27,8 @@ const HomePage = () => {
                 p={3}
                 textAlign={'center'}
             >
-                <Text fontSize={'26px'} fontWeight={'300'}>
-                    TALK-TIME
+                <Text fontSize={'2xl'} fontWeight={'500'} color={'facebook.900'}>
+                    TVD CHAT 😄
                 </Text>
             </Box>
             <Box

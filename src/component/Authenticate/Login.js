@@ -22,7 +22,6 @@ const Login = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const handleLogin = async () => {
-        console.log('ok');
         if (!email || !password) {
             toast({
                 title: 'Account created.',
@@ -37,11 +36,11 @@ const Login = () => {
                 email,
                 password,
             };
+            console.log(user);
             const response = await axios.post(`${process.env.REACT_APP_URL}/api/authUser`, user);
             console.log(response);
             if (response.status == 200) {
                 toast({
-                    // title: 'Account created.',
                     description: 'Đăng nhập thành công.',
                     status: 'success',
                     duration: 2000,
@@ -91,11 +90,13 @@ const Login = () => {
                     </InputRightElement>
                 </InputGroup>
             </FormControl>
-            <Wrap spacing={4}>
+            <Wrap spacing={4} w={'100%'} display={'flex'} justifyContent={'center'}>
                 <WrapItem width={'100%'}>
                     <Button
                         colorScheme="blue"
                         w={'lg'}
+                        // p={12}
+                        // size={'sm'}
                         onClick={() => {
                             handleLogin();
                         }}

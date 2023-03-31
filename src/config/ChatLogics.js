@@ -2,6 +2,10 @@ export const getSender = (loggerUser, user) => {
     console.log(user);
     return user[0].name === loggerUser?.user?.name ? user[1]?.name : user[0].name;
 };
+export const getSenderAvarta = (loggerUser, user) => {
+    console.log(user);
+    return user[0].name === loggerUser?.user?.name ? user[1]?.picture : user[0].picture;
+};
 export const getSenderFull = (loggerUser, user) => {
     console.log(user);
     return user[0].name === loggerUser?.user?.name ? user[1] : user[0];

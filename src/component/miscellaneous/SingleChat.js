@@ -1,8 +1,8 @@
 import { ArrowBackIcon } from '@chakra-ui/icons';
-import { Box, FormControl, IconButton, Image, Input, Spinner, Text, useToast } from '@chakra-ui/react';
+import { Avatar, Box, Button, FormControl, IconButton, Image, Input, Spinner, Text, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../AxiosConfig/AxiosConfig';
-import { getSender, getSenderFull } from '../../config/ChatLogics';
+import { getSender, getSenderAvarta, getSenderFull } from '../../config/ChatLogics';
 import { GetContext } from '../../Context/chatProvide';
 import ProfileModel from './ProfileModel';
 import UpdateGroupChatModel from './UpdateGroupChatModel';
@@ -10,8 +10,9 @@ import '../styles.css';
 import ScrollAbleChat from './ScrollAbleChat';
 import { decodeToken } from './decode';
 const { io } = require('socket.io-client');
+// import { io } from 'socket.io-client';
 const ENPOINT = process.env.REACT_APP_URL;
-var socket, selectedChatCompare;
+let socket, selectedChatCompare;
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const { user, selectedChat, setSelectedChat, notification, setNotification } = GetContext();
     const [loading, setLoading] = useState(false);
@@ -20,13 +21,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const [socketConnected, setSocketConnected] = useState(false);
     const [typing, setTyping] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
-    const userId = decodeToken(user?.token);
+    const [clickButton, setClickButton] = useState(false);
+    // const userId = decodeToken(user?.token);
+    const decodeId = decodeToken(user?.token);
     const toast = useToast();
-    // console.log(newMessages);
-    // console.log(!typing);
-    console.log(isTyping);
+    console.log(selectedChat);
     const sendMessage = async (event) => {
-        if (event.key == 'Enter' && newMessages) {
+        if (newMessages) {
             socket.emit('stop typing', selectedChat._id);
             try {
                 const response = await axiosInstance(user?.token).post('/api/sendMessage', {
@@ -34,8 +35,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     chatId: selectedChat._id,
                 });
                 if (response.status == 200) {
+                    // setNewMessages('');
                     // console.log(response);
-                    setNewMessages('');
                     await socket.emit('newMessage', response.data);
                     setMessages([...messages, response.data]);
                 }
@@ -76,7 +77,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             setLoading(true);
             const response = await axiosInstance(user?.token).get(`/api/getChat/${selectedChat._id}`);
             if (response.status == 200) {
-                // console.log(response.data);
                 setMessages(response.data);
                 setLoading(false);
                 socket.emit('join chat', selectedChat._id);
@@ -92,8 +92,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     };
     useEffect(() => {
         socket = io(ENPOINT);
-        socket.emit('setup', userId);
-        socket.on('connection', () => setSocketConnected(false));
+        // socket.emit('setup', userId);
+        // socket.on('connection', () => setSocketConnected(false));
         socket.on('typing', () => setIsTyping(true));
         socket.on('stop typing', () => setIsTyping(false));
     }, []);
@@ -101,21 +101,23 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         getAllMessage();
         selectedChatCompare = selectedChat;
     }, [selectedChat]);
-    useEffect(() => {
-        // console.log('send ok');
-        socket.on('newMessage', (newMessageRecieved) => {
-            if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id) {
-                // give notification
-                if (!notification.includes(newMessageRecieved)) {
-                    setNotification([newMessageRecieved, ...notification]);
-                    setFetchAgain(!fetchAgain);
-                }
-            } else {
-                // console.log(newMessageRecieved);
-                setMessages([...messages, newMessageRecieved]);
+    // useEffect(() => {
+    socket?.on('newMessage', (newMessageRecieved) => {
+        if (selectedChatCompare._id !== newMessageRecieved.chat._id) {
+            // give notification
+            if (!notification.includes(newMessageRecieved)) {
+                setNotification([newMessageRecieved, ...notification]);
+                setFetchAgain(!fetchAgain);
             }
-        });
-    }, [messages]);
+        } else {
+            console.log(newMessageRecieved);
+            if (decodeId === newMessageRecieved.sender._id) {
+                return;
+            }
+            setMessages([...messages, newMessageRecieved]);
+        }
+    });
+    // }, []);
     return (
         <>
             {selectedChat ? (
@@ -137,7 +139,16 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                         />
                         {!selectedChat.isGroupChat ? (
                             <>
-                                <Text fontSize={'xl'}>{getSender(user, selectedChat.user)}</Text>
+                                <Text fontSize={'xl'} display={'flex'} alignItems={'center'}>
+                                    <Avatar
+                                        size="xs"
+                                        name={getSender(user, selectedChat.user)}
+                                        src={getSenderAvarta(user, selectedChat.user)}
+                                    />
+                                    <Text fontSize={'xl'} marginLeft={'10px'}>
+                                        {getSender(user, selectedChat.user)}
+                                    </Text>
+                                </Text>
                                 <ProfileModel user={getSenderFull(user, selectedChat.user)} />
                             </>
                         ) : (
@@ -169,7 +180,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                                 <ScrollAbleChat messages={messages} />
                             </div>
                         )}
-                        <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+                        <FormControl
+                            onKeyDown={(event) => {
+                                if (event.key == 'Enter') {
+                                    sendMessage();
+                                }
+                            }}
+                            isRequired
+                            mt={3}
+                        >
                             {isTyping ? (
                                 <img
                                     src="https://cdn.dribbble.com/users/8424/screenshots/1036999/dots_2.gif"
@@ -182,12 +201,28 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                             ) : (
                                 ''
                             )}
-                            <Input
-                                variant={'filled'}
-                                bg={'E0E0E0'}
-                                placeholder={'Viết tin nhắn...'}
-                                onChange={typingHandle}
-                            />
+                            <Box display={'flex'} alignItems={'center'}>
+                                <Input
+                                    variant={'filled'}
+                                    bg={'E0E0E0'}
+                                    placeholder={'Viết tin nhắn...'}
+                                    onChange={typingHandle}
+                                    marginRight={'10px'}
+                                />
+                                <Button
+                                    colorScheme="teal"
+                                    size="sm"
+                                    display={'flex'}
+                                    alignItems={'center'}
+                                    // w={'40px'}
+                                    height={'38px'}
+                                    onClick={(event) => {
+                                        sendMessage(event);
+                                    }}
+                                >
+                                    Gửi
+                                </Button>
+                            </Box>
                         </FormControl>
                     </Box>
                 </>

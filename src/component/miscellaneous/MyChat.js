@@ -32,8 +32,6 @@ const MyChat = ({ fetchAgain }) => {
         setLoggerUser(JSON.parse(localStorage.getItem('userInfor')));
         fetchChat();
     }, [fetchAgain]);
-    console.log(chats);
-    console.log(loggerUser);
     return (
         <Box
             display={{ base: selectedChat ? 'none' : 'flex', md: 'flex' }}
@@ -62,7 +60,7 @@ const MyChat = ({ fetchAgain }) => {
                         fontSize={{ base: '17px', md: '10px', lg: '17px' }}
                         rightIcon={<AddIcon />}
                     >
-                        New Group Chat
+                        Tạo Group Chat
                     </Button>
                 </GroupChatModel>
             </Box>

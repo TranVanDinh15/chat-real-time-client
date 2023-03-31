@@ -27,7 +27,8 @@ import {
     Skeleton,
 } from '@chakra-ui/react';
 import { faSearchengin } from '@fortawesome/free-brands-svg-icons';
-import { faBell } from '@fortawesome/free-solid-svg-icons';
+import { faBell } from '@fortawesome/free-regular-svg-icons';
+// import { faBell } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { Effect } from 'react-notification-badge';
@@ -124,13 +125,19 @@ const SideDrawer = () => {
                 <Tooltip label={'Tìm kiếm người dùng'} hasArrow placement="bottom-end">
                     <Button variant={'ghost'} onClick={onOpen}>
                         <Icon as={Search2Icon} />
-                        <Text d={{ base: 'none', md: 'flex' }} px={'10px'}>
-                            Search User
+                        <Text d={{ base: 'none', md: 'flex' }} px={'10px'} className={'text_search'}>
+                            Tìm kiếm
                         </Text>
                     </Button>
                 </Tooltip>
-                <Text fontSize="2xl" fontFamily={''}>
-                    TALK-TIME
+                <Text
+                    fontSize={'xl'}
+                    fontFamily={'work sans'}
+                    fontWeight={500}
+                    color={'facebook.900'}
+                    className={'textLogo'}
+                >
+                    TVD CHAT 😄
                 </Text>
                 <div
                     style={{
@@ -149,7 +156,9 @@ const SideDrawer = () => {
                                         fontSize: '20px',
                                         marginTop: '10px',
                                         marginRight: '10px',
+                                        // color: 'red',
                                     }}
+                                    className={'bell_icon'}
                                 />
                             </MenuButton>
                             <MenuList pl={2}>
@@ -176,13 +185,13 @@ const SideDrawer = () => {
                         <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
                             <Wrap>
                                 <WrapItem>
-                                    <Avatar name="Dan Abrahmov" src={user?.pic} size={'sm'} />
+                                    <Avatar name={user?.name} src={user?.pic} size={'xs'} className={'avatar_header'} />
                                 </WrapItem>
                             </Wrap>
                         </MenuButton>
                         <MenuList>
                             <ProfileModel user={user}>
-                                <MenuItem>Profile</MenuItem>
+                                <MenuItem>Hồ sơ</MenuItem>
                             </ProfileModel>
                             <MenuItem
                                 onClick={() => {
@@ -198,7 +207,7 @@ const SideDrawer = () => {
                     <DrawerOverlay />
                     <DrawerContent>
                         <DrawerCloseButton />
-                        <DrawerHeader>Search User</DrawerHeader>
+                        <DrawerHeader>Tìm kiếm</DrawerHeader>
 
                         <DrawerBody>
                             <Box display={'flex'}>
